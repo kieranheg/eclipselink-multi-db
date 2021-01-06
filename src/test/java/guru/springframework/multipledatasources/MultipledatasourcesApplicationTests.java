@@ -39,10 +39,10 @@ public class MultipledatasourcesApplicationTests {
         
         member = new Member();
         member.setMemberId("M001");
-        member.setName("Maureen Mpofu");
+        member.setName("Jumping Jacque Flash");
         
         cardHolder = new CardHolder();
-        cardHolder.setCardNumber("22111111993");
+        cardHolder.setCardNumber("196619671968");
         cardHolder.setMemberId(member.getMemberId());
         
     }
