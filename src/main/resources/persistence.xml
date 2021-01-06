@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+    <persistence-unit name="member" transaction-type="JTA">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>guru.springframework.multipledatasources.model.member.Member</class>
+    </persistence-unit>
+    <persistence-unit name="cardholder" transaction-type="JTA">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>guru.springframework.multipledatasources.model.cardholder.CardHolder</class>
+    </persistence-unit>
+
+
+<!--    <persistence-unit name="member" transaction-type="RESOURCE_LOCAL">-->
+<!--        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
+<!--        <class>guru.springframework.multipledatasources.model.member.Member</class>-->
+<!--        <exclude-unlisted-classes>false</exclude-unlisted-classes>-->
+
+<!--        <properties>-->
+<!--            <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://localhost:1433;database=memberdb;SelectMethod=cursor"/>-->
+<!--            <property name="javax.persistence.jdbc.user" value="sa"/>-->
+<!--            <property name="javax.persistence.jdbc.password" value="password!23"/>-->
+<!--            <property name="javax.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>-->
+<!--&lt;!&ndash;            <property name="javax.persistence.schema-generation.database.action"&ndash;&gt;-->
+<!--&lt;!&ndash;                      value="drop-and-create"/>&ndash;&gt;-->
+<!--&lt;!&ndash;            <property name="javax.persistence.sql-load-script-source" value="META-INF/sql/data.sql"/>&ndash;&gt;-->
+<!--        </properties>-->
+<!--    </persistence-unit>-->
+
+<!--    <persistence-unit name="cardholder" transaction-type="RESOURCE_LOCAL">-->
+<!--        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
+<!--        <class>guru.springframework.multipledatasources.model.cardholder.CardHolder</class>-->
+<!--        <exclude-unlisted-classes>false</exclude-unlisted-classes>-->
+
+<!--        <properties>-->
+<!--            <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://localhost:1433;database=cardholderdb;SelectMethod=cursor"/>-->
+<!--            <property name="javax.persistence.jdbc.user" value="sa"/>-->
+<!--            <property name="javax.persistence.jdbc.password" value="password!23"/>-->
+<!--            <property name="javax.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>-->
+<!--            &lt;!&ndash;            <property name="javax.persistence.schema-generation.database.action"&ndash;&gt;-->
+<!--            &lt;!&ndash;                      value="drop-and-create"/>&ndash;&gt;-->
+<!--            &lt;!&ndash;            <property name="javax.persistence.sql-load-script-source" value="META-INF/sql/data.sql"/>&ndash;&gt;-->
+<!--        </properties>-->
+<!--    </persistence-unit>-->
+
+</persistence>
