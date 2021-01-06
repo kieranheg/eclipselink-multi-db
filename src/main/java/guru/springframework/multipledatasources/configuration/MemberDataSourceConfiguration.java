@@ -1,17 +1,13 @@
 package guru.springframework.multipledatasources.configuration;
 
-import com.zaxxer.hikari.HikariDataSource;
-import guru.springframework.multipledatasources.model.cardholder.CardHolder;
 import guru.springframework.multipledatasources.model.member.Member;
 import org.eclipse.persistence.config.BatchWriting;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.persistence.logging.SessionLog;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +37,7 @@ import java.util.Map;
 public class MemberDataSourceConfiguration extends JpaBaseConfiguration {
     
     protected MemberDataSourceConfiguration(DataSource dataSource, JpaProperties properties,
-                                                ObjectProvider<JtaTransactionManager> jtaTransactionManager) {
+                                            ObjectProvider<JtaTransactionManager> jtaTransactionManager) {
         super(dataSource, properties, jtaTransactionManager);
     }
     
@@ -57,23 +53,8 @@ public class MemberDataSourceConfiguration extends JpaBaseConfiguration {
         return ret;
     }
     
-//    @Bean
-//    @Primary
-//    @ConfigurationProperties("app.datasource.member")
-//    public DataSourceProperties memberDataSourceProperties() {
-//        return new DataSourceProperties();
-//    }
-//
-//    @Bean
-//    @Primary
-//    @ConfigurationProperties("app.datasource.member.configuration")
-//    public DataSource memberDataSource() {
-//        return memberDataSourceProperties().initializeDataSourceBuilder()
-//                .type(HikariDataSource.class).build();
-//    }
-    
     @Primary
-    @Bean("XXXX")
+    @Bean("memberDataSource")
     public static DataSource dataSource() {
         final DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -87,7 +68,7 @@ public class MemberDataSourceConfiguration extends JpaBaseConfiguration {
     @Bean(name = "memberEntityManagerFactory")
     @PersistenceUnit(unitName = "member")
     public LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactory(
-            EntityManagerFactoryBuilder builder, DataSource dataSource) {
+            EntityManagerFactoryBuilder builder, @Qualifier("memberDataSource") DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
                 .packages(Member.class)
@@ -95,12 +76,6 @@ public class MemberDataSourceConfiguration extends JpaBaseConfiguration {
                 .properties(initJpaProperties())
                 .build();
     }
-//    public LocalContainerEntityManagerFactoryBean memberEntityManagerFactory(EntityManagerFactoryBuilder builder) {
-//        return builder
-//                .dataSource(memberDataSource())
-//                .packages(Member.class)
-//                .build();
-//    }
     
     @Primary
     @Bean(name = "memberTransactionManager")
@@ -110,10 +85,10 @@ public class MemberDataSourceConfiguration extends JpaBaseConfiguration {
     }
     
     @Primary
-    @Bean("YYYYY")
+    @Bean("memberProperties")
     public static JpaProperties properties() {
         final JpaProperties jpaProperties = new JpaProperties();
-//        jpaProperties.setShowSql(true);
+        jpaProperties.setShowSql(true);
         jpaProperties.setDatabasePlatform("org.eclipse.persistence.platform.database.SQLServerPlatform");
         return jpaProperties;
     }
@@ -124,7 +99,7 @@ public class MemberDataSourceConfiguration extends JpaBaseConfiguration {
         ret.put(PersistenceUnitProperties.BATCH_WRITING, BatchWriting.JDBC);
         ret.put(PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.FINEST_LABEL);
         ret.put(PersistenceUnitProperties.WEAVING, detectWeavingMode());
-//        ret.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.CREATE_ONLY);
+        ret.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.CREATE_ONLY);
 //        ret.put(PersistenceUnitProperties.DDL_GENERATION_MODE, PersistenceUnitProperties.DDL_DATABASE_GENERATION);
         return ret;
     }
