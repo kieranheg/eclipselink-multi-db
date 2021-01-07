@@ -34,22 +34,10 @@ import java.util.Map;
         basePackages = "guru.springframework.multipledatasources.repository.cardholder",
         entityManagerFactoryRef = "cardHolderEntityManagerFactory",
         transactionManagerRef = "cardHolderTransactionManager")
-public class CardHolderDataSourceConfiguration extends JpaBaseConfiguration {
+public class CardHolderDataSourceConfiguration extends JpaDataSourceConfiguration {
     
     protected CardHolderDataSourceConfiguration(DataSource dataSource, JpaProperties properties, ObjectProvider<JtaTransactionManager> jtaTransactionManager) {
         super(dataSource, properties, jtaTransactionManager);
-    }
-    
-    @Override
-    protected AbstractJpaVendorAdapter createJpaVendorAdapter() {
-        return new EclipseLinkJpaVendorAdapter();
-    }
-    
-    @Override
-    protected Map<String, Object> getVendorProperties() {
-        final Map<String, Object> ret = new HashMap<>();
-        ret.put(PersistenceUnitProperties.BATCH_WRITING, BatchWriting.JDBC);
-        return ret;
     }
     
     @Bean("cardHolderDataSource")
@@ -66,7 +54,7 @@ public class CardHolderDataSourceConfiguration extends JpaBaseConfiguration {
                 .dataSource(dataSource)
                 .packages(CardHolder.class)
                 .persistenceUnit("cardholder")
-                .properties(initJpaProperties())
+                .properties(getVendorProperties())
                 .build();
     }
     
@@ -74,28 +62,5 @@ public class CardHolderDataSourceConfiguration extends JpaBaseConfiguration {
     public PlatformTransactionManager cardHolderTransactionManager(
             final @Qualifier("cardHolderEntityManagerFactory") LocalContainerEntityManagerFactoryBean cardHolderEntityManagerFactory) {
         return new JpaTransactionManager(cardHolderEntityManagerFactory.getObject());
-    }
-    
-    @Bean("cardHolderProperties")
-    public static JpaProperties properties() {
-        final JpaProperties jpaProperties = new JpaProperties();
-        jpaProperties.setShowSql(true);
-        jpaProperties.setDatabasePlatform("org.eclipse.persistence.platform.database.SQLServerPlatform");
-        return jpaProperties;
-    }
-    
-    private static Map<String, ?> initJpaProperties() {
-        final Map<String, Object> ret = new HashMap<>();
-        // Add any JpaProperty you are interested in and is supported by your Database and JPA implementation
-        ret.put(PersistenceUnitProperties.BATCH_WRITING, BatchWriting.JDBC);
-        ret.put(PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.FINEST_LABEL);
-        ret.put(PersistenceUnitProperties.WEAVING, detectWeavingMode());
-        ret.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.CREATE_ONLY);
-//        ret.put(PersistenceUnitProperties.DDL_GENERATION_MODE, PersistenceUnitProperties.DDL_DATABASE_GENERATION);
-        return ret;
-    }
-    
-    private static String detectWeavingMode() {
-        return InstrumentationLoadTimeWeaver.isInstrumentationAvailable() ? "true" : "false";
     }
 }

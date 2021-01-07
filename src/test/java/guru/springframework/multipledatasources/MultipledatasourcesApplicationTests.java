@@ -38,11 +38,11 @@ public class MultipledatasourcesApplicationTests {
     public void initializeDataObjects() {
         
         member = new Member();
-        member.setMemberId("M0011");
-        member.setName("Jumpinging Jacques Flash");
+        member.setMemberId("JKH01");
+        member.setName("Extended Jacques Flash");
         
         cardHolder = new CardHolder();
-        cardHolder.setCardNumber("30096666");
+        cardHolder.setCardNumber("2121212121");
         cardHolder.setMemberId(member.getMemberId());
         
     }
