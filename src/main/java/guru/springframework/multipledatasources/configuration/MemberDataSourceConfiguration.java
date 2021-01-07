@@ -49,6 +49,7 @@ public class MemberDataSourceConfiguration extends JpaDataSourceConfiguration {
                 .dataSource(dataSource)
                 .packages(Member.class)
                 .persistenceUnit("member")
+                .jta(true)
                 .properties(getVendorProperties())
                 .build();
     }

@@ -54,6 +54,7 @@ public class CardHolderDataSourceConfiguration extends JpaDataSourceConfiguratio
                 .dataSource(dataSource)
                 .packages(CardHolder.class)
                 .persistenceUnit("cardholder")
+                .jta(true)
                 .properties(getVendorProperties())
                 .build();
     }
