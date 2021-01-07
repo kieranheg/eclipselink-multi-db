@@ -8,12 +8,13 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.AbstractJpaVendorAdapter;
@@ -29,13 +30,13 @@ import java.util.Map;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "guru.springframework.multipledatasources.repository.cardholder",
+@EnableJpaRepositories(
+        basePackages = "guru.springframework.multipledatasources.repository.cardholder",
         entityManagerFactoryRef = "cardHolderEntityManagerFactory",
         transactionManagerRef = "cardHolderTransactionManager")
 public class CardHolderDataSourceConfiguration extends JpaBaseConfiguration {
     
-    protected CardHolderDataSourceConfiguration(DataSource dataSource, JpaProperties properties,
-                                                ObjectProvider<JtaTransactionManager> jtaTransactionManager) {
+    protected CardHolderDataSourceConfiguration(DataSource dataSource, JpaProperties properties, ObjectProvider<JtaTransactionManager> jtaTransactionManager) {
         super(dataSource, properties, jtaTransactionManager);
     }
     
@@ -52,16 +53,12 @@ public class CardHolderDataSourceConfiguration extends JpaBaseConfiguration {
     }
     
     @Bean("cardHolderDataSource")
-    public static DataSource dataSource() {
-        final DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        dataSource.setUrl("jdbc:sqlserver://localhost:1433;database=cardholderdb;SelectMethod=cursor");
-        dataSource.setUsername("sa");
-        dataSource.setPassword("password!23");
-        return dataSource;
+    @ConfigurationProperties("app.datasource.cardholder")
+    public static DataSource secondaryDataSource() {
+        return DataSourceBuilder.create().build();
     }
     
-    @Bean(name = "cardHolderEntityManagerFactory")
+    @Bean("cardHolderEntityManagerFactory")
     @PersistenceUnit(unitName = "cardholder")
     public LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactory(
             EntityManagerFactoryBuilder builder, @Qualifier("cardHolderDataSource") DataSource dataSource) {
@@ -73,7 +70,7 @@ public class CardHolderDataSourceConfiguration extends JpaBaseConfiguration {
                 .build();
     }
     
-    @Bean(name = "cardHolderTransactionManager")
+    @Bean("cardHolderTransactionManager")
     public PlatformTransactionManager cardHolderTransactionManager(
             final @Qualifier("cardHolderEntityManagerFactory") LocalContainerEntityManagerFactoryBean cardHolderEntityManagerFactory) {
         return new JpaTransactionManager(cardHolderEntityManagerFactory.getObject());

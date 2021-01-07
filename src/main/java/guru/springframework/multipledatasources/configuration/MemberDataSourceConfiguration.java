@@ -8,13 +8,14 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.AbstractJpaVendorAdapter;
@@ -30,14 +31,14 @@ import java.util.Map;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "guru.springframework.multipledatasources.repository.member",
+@EnableJpaRepositories(
+        basePackages = "guru.springframework.multipledatasources.repository.member",
         entityManagerFactoryRef = "memberEntityManagerFactory",
         transactionManagerRef = "memberTransactionManager"
 )
 public class MemberDataSourceConfiguration extends JpaBaseConfiguration {
     
-    protected MemberDataSourceConfiguration(DataSource dataSource, JpaProperties properties,
-                                            ObjectProvider<JtaTransactionManager> jtaTransactionManager) {
+    protected MemberDataSourceConfiguration(DataSource dataSource, JpaProperties properties, ObjectProvider<JtaTransactionManager> jtaTransactionManager) {
         super(dataSource, properties, jtaTransactionManager);
     }
     
@@ -55,17 +56,13 @@ public class MemberDataSourceConfiguration extends JpaBaseConfiguration {
     
     @Primary
     @Bean("memberDataSource")
-    public static DataSource dataSource() {
-        final DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        dataSource.setUrl("jdbc:sqlserver://localhost:1433;database=memberdb;SelectMethod=cursor");
-        dataSource.setUsername("sa");
-        dataSource.setPassword("password!23");
-        return dataSource;
+    @ConfigurationProperties("app.datasource.member")
+    public static DataSource primaryDataSource() {
+        return DataSourceBuilder.create().build();
     }
     
     @Primary
-    @Bean(name = "memberEntityManagerFactory")
+    @Bean("memberEntityManagerFactory")
     @PersistenceUnit(unitName = "member")
     public LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactory(
             EntityManagerFactoryBuilder builder, @Qualifier("memberDataSource") DataSource dataSource) {
@@ -78,7 +75,7 @@ public class MemberDataSourceConfiguration extends JpaBaseConfiguration {
     }
     
     @Primary
-    @Bean(name = "memberTransactionManager")
+    @Bean("memberTransactionManager")
     public PlatformTransactionManager memberTransactionManager(
             final @Qualifier("memberEntityManagerFactory") LocalContainerEntityManagerFactoryBean memberEntityManagerFactory) {
         return new JpaTransactionManager(memberEntityManagerFactory.getObject());
